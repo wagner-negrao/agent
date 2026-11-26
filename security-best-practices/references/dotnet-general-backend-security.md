@@ -1,0 +1,16 @@
+# .NET 8+ backend security
+
+Check `TargetFramework` or `TargetFrameworks`, inherited build settings, `global.json`, deployed runtime and package versions. For a .NET 8 baseline use `net8.0` APIs and verify against the intended SDK and runtime. Apply ASP.NET Core and EF Core guidance only if the project uses those frameworks.
+
+| Surface | .NET control |
+| --- | --- |
+| Access and input | Use ASP.NET Core policies and explicit anonymous endpoints where intended. Enforce object and tenant authorization through a scoped query or resource-based `IAuthorizationService` checks. Bind to explicit DTOs and validate domain invariants before writes. Verify validation is wired for the endpoint style used, especially Minimal APIs on .NET 8. |
+| Middleware and browser | Trust forwarded headers only from configured proxies or networks. Verify routing, CORS, authentication and authorization ordering and apply antiforgery checks for cookie-authenticated writes. For Minimal API form endpoints, verify antiforgery registration, middleware order and endpoint metadata. Keep Razor encoding and review raw HTML sinks. |
+| Data access | Prefer EF Core LINQ or bound parameters. Use the parameterizing `FromSql` interpolation overload where applicable. Review every use of raw SQL APIs and map dynamic identifiers to approved constants. Verify queries and cache keys preserve tenant boundaries. |
+| Serialization and XML | Use `System.Text.Json` with explicit DTOs, bounded input and explicit derived types where polymorphism is required. Replace `BinaryFormatter` where present. For untrusted XML configure `XmlReaderSettings.DtdProcessing` to `Prohibit` and `XmlResolver` to `null`. |
+| Files and outbound HTTP | Enforce limits before buffering uploads, use server-generated paths, and keep files outside the static web root. Use `IHttpClientFactory` or an appropriately configured long-lived `HttpClient`, enforce destination and redirect policy, and apply cancellation and bounded reads when streaming. Keep certificate validation enabled. |
+| Secrets and dependencies | Use deployment-managed secrets. Redact sensitive data from structured logs and production errors. Protect and share ASP.NET Core Data Protection keys when replicas share cookies. Review NuGet direct and transitive dependencies and patch the deployed runtime and container image. |
+
+Use ASP.NET Core rate limiting and request limits where applicable. Bound partition cardinality with a finite key space or an implementation that safely evicts idle keys. Choose trusted, stable keys. Account for per-replica counters when a limit is intended to apply across replicas. Propagate cancellation through I/O, avoid sync-over-async, and verify connection-pool usage, allocations and tail latency. Run the project's `dotnet build` and `dotnet test` workflow for the declared targets.
+
+[Resource-based authorization](https://learn.microsoft.com/en-us/aspnet/core/security/authorization/resourcebased?view=aspnetcore-8.0) · [Antiforgery](https://learn.microsoft.com/en-us/aspnet/core/security/anti-request-forgery?view=aspnetcore-8.0) · [Rate limiting](https://learn.microsoft.com/en-us/aspnet/core/performance/rate-limit?view=aspnetcore-8.0) · [EF Core SQL queries](https://learn.microsoft.com/en-us/ef/core/querying/sql-queries)

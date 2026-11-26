@@ -1,0 +1,16 @@
+# Java 17+ backend security
+
+Inspect the JDK vendor and patch level, the build's target release, and the effective runtime. For a Java 17 baseline, configure Maven or Gradle to compile with release 17 and run tests on JDK 17. Use the project's higher baseline when declared. Spring Boot 3.x requires Java 17 or later. Verify support and security patch coverage for the framework actually installed. Apply Spring Security or Servlet guidance only for the matching release and API namespace. [Spring Boot 3 system requirements](https://docs.spring.io/spring-boot/3.5/system-requirements.html)
+
+| Surface | Java control |
+| --- | --- |
+| Access and input | Use the established framework security chain and explicit public routes. For Spring applications verify matcher order, method security where configured, and object and tenant checks in service or repository paths. Use request DTOs with field, size and range constraints, then enforce domain invariants. |
+| Database and commands | Bind query values with JDBC `PreparedStatement` or ORM parameter APIs. Map sortable columns and other identifiers to constants. Prefer Java APIs for filesystem and process-adjacent work. Where a process is required, fix the executable, constrain each argument and account for how the executable interprets options. |
+| Browser | Keep template autoescaping enabled and verify the context for any raw rendering. Keep antiforgery checks for state changes authenticated by browser cookies or other automatically attached credentials. Validate explicitly allowed CORS origins when cross-origin access is needed. |
+| Serialization and XML | Keep Java native deserialization away from untrusted input. Where a trusted legacy protocol requires it, configure `ObjectInputFilter` with a class allowlist and graph limits. Use explicit JSON DTOs and avoid unrestricted polymorphic typing. For XML, disable DTDs when unnecessary and deny external DTD and schema access with parser-specific settings. Cover parser initialization and denial of external I/O in tests. |
+| Files and outbound HTTP | Keep files in controlled storage with generated names, streamed byte limits and isolation from web roots. Enforce destination policy on outbound calls. Reuse `HttpClient` instances by policy, set connect and request timeouts, and enforce byte and time budgets while consuming response streams. Keep certificate and hostname verification enabled. |
+| Secrets and operations | Use a secrets store or deployment-managed credentials. Avoid logging tokens and sensitive request bodies. Apply least privilege to service and database identities. Check direct and transitive Maven or Gradle dependencies and deployed base image against known advisories. |
+
+Bound executors and queues, propagate cancellation where feasible, use connection pools and close JDBC resources with try-with-resources. Check query count, allocations, GC pauses and tail latency when adding work to a hot path. Verify tests with the project's wrapper and its declared JDK.
+
+[Java SE 17 API](https://docs.oracle.com/en/java/javase/17/docs/api/index.html) · [Oracle serialization filtering](https://docs.oracle.com/en/java/javase/17/core/serialization-filtering1.html)

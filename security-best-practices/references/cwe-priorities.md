@@ -1,0 +1,17 @@
+# CWE priorities and verification
+
+The [MITRE CWE Top 25 for 2025](https://cwe.mitre.org/top25/archive/2025/2025_cwe_top25.html) informs this starting set. Adjust priority to exposed functionality, data sensitivity, privilege and reachability. Use the [MITRE mapping guidance](https://cwe.mitre.org/documents/cwe_usage/guidance.html) to select an actionable root cause. Broad entries such as CWE-20, CWE-200 and CWE-284 are review prompts. Prefer a more specific entry when the evidence supports it.
+
+| Area | CWE | Preventive control and expected behavior |
+| --- | --- | --- |
+| Authentication and access | 306, 287, 862, 863, 639 | Authenticate protected operations, verify token issuer, audience, integrity and lifetime where applicable, and deny by default. Enforce action, object and tenant permissions server side. Check anonymous, authorized, and wrong-owner or wrong-tenant cases with test identities. |
+| SQL and interpreter boundaries | 89, 77, 78, 94 | Bind values, allowlist identifiers from fixed mappings, prefer native APIs over external commands, and keep untrusted input out of code evaluation. Check literal data handling and rejection of unsupported operations. |
+| Browser trust | 79, 352 | Apply contextual encoding, sanitize deliberately supported rich HTML, and require antiforgery checks for state changes made with automatically attached credentials. Verify ordinary rendering and rejection of missing or invalid tokens. |
+| Files and uploads | 22, 59, 434 | Use server-generated names, separate uploads from executable content, impose byte and type limits, and constrain filesystem operations to the intended destination. Consider symlinks and races where storage can be modified by another principal. Check accepted types, boundary sizes and isolation. |
+| Deserialization and XML | 502, 611 | Use explicit DTOs, constrain types and parser resources, and disable external XML resolution for untrusted documents. Verify type restrictions, bounded parsing and the absence of external I/O. |
+| Outbound requests | 918 | Prefer fixed destination mappings, enforce destination policy at connection time or through a controlled egress proxy, disable redirects or reapply policy to each hop, and bound time and bytes. Check allowed routing and policy rejection with a stub or controlled test fixtures. |
+| Secrets and sensitive data | 798, 532, 295 | Use managed secrets, redact logs and errors, and keep TLS verification enabled. Verify telemetry and failure handling with synthetic data. |
+| Availability and correctness | 476, 770, 1333, 362 | Validate nulls and invariants at boundaries, bound queues and concurrency, apply timeouts and cancellation, and use atomic state transitions. Measure bounded resource use and recovery under representative contention. |
+| Native and unsafe code | 787, 416, 125, 120, 121, 122 | Review JNI, P/Invoke, unsafe blocks and native libraries where present. Verify bounds, ownership and lifetime using the native toolchain and memory diagnostics available to the project. |
+
+Use focused defensive tests through real handlers and service boundaries with controlled fixtures. Check status, stored state, output and resource consumption as applicable. Document tests skipped because a toolchain or representative environment was unavailable. For performance-sensitive changes, keep workload, data, warm-up and deployment settings comparable and track p95/p99 latency, throughput, errors, and the limiting resource such as CPU, memory, connections or queue depth.
